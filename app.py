@@ -4,6 +4,7 @@ app = Flask(__name__)
 
 # In-memory data store for demo purposes
 data_store = []
+next_id = 1
 
 @app.route('/')
 def home():
@@ -18,15 +19,17 @@ def get_items():
 @app.route('/api/items', methods=['POST'])
 def add_item():
     """API endpoint to add a new item"""
+    global next_id
     if not request.json or 'name' not in request.json:
         return jsonify({'error': 'Bad request - name is required'}), 400
     
     item = {
-        'id': len(data_store) + 1,
+        'id': next_id,
         'name': request.json['name'],
         'description': request.json.get('description', '')
     }
     data_store.append(item)
+    next_id += 1
     return jsonify({'message': 'Item added successfully', 'item': item}), 201
 
 @app.route('/api/items/<int:item_id>', methods=['GET'])
